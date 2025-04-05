@@ -40,6 +40,7 @@ func checkID(username string) int {
 	case 200:
 		return 1
 	default:
+		// this is kinda ass btw, next version ill implement a checking method that uses github's API so we can "bypass" this restriction
 		fmt.Printf(Yellow+"RATELIMITED: Unexpected status code %d for username: %s; Retrying in 15 seconds.. \n"+Reset, resp.StatusCode(), username)
 		return 2
 	}

@@ -36,6 +36,8 @@
 # release folder
 .release/*
 .release/
+.releases/*
+.releases/
 
 # Go workspace file
 go.work
