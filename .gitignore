@@ -26,6 +26,13 @@
 .sessions/*
 .sessions/
 
+# test env file
+.env/
+.env/*
+
+# auth key files
+*.auth
+
 # Go workspace file
 go.work
 
