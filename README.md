@@ -86,4 +86,10 @@ Feel free to contribute or open issues if you encounter any bugs or have suggest
 
 ---
 
+## Preview of the interface
+
+![image](https://github.com/user-attachments/assets/fce7fef9-7023-4ad6-ad71-f603316c80e7)
+
+---
+
 Enjoy checking your usernames and have fun!
