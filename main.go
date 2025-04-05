@@ -25,24 +25,23 @@ var Cyan = "\033[36m"
 var Gray = "\033[37m"
 var White = "\033[97m"
 
-func checkID(username string) bool {
+func checkID(username string) int {
 	url := "https://github.com/" + username
 	resp, err := scrapper.R().Get(url)
 	if err != nil {
 		fmt.Println(Red+"Request error:"+Reset, err)
 		pauseTerminal()
-		return false
+		return 2
 	}
 
 	switch resp.StatusCode() {
 	case 404:
-		return false
+		return 0
 	case 200:
-		return true
+		return 1
 	default:
-		fmt.Printf(Yellow+"Unexpected status code %d for username: %s\n"+Reset, resp.StatusCode(), username)
-		pauseTerminal()
-		return false
+		fmt.Printf(Yellow+"RATELIMITED: Unexpected status code %d for username: %s; Retrying in 15 seconds.. \n"+Reset, resp.StatusCode(), username)
+		return 2
 	}
 }
 
@@ -124,9 +123,25 @@ func showSplash() {
 	fmt.Println(Blue + `
 ------------------------------------------------------------------------------------------------------------------------
 
-┏┓• ┓   ┓   ┳┳                ┏┓┓    ┓     
-┃┓┓╋┣┓┓┏┣┓  ┃┃┏┏┓┏┓┏┓┏┓┏┳┓┏┓  ┃ ┣┓┏┓┏┃┏┏┓┏┓
-┗┛┗┗┛┗┗┻┗┛  ┗┛┛┗ ┛ ┛┗┗┻┛┗┗┗   ┗┛┛┗┗ ┗┛┗┗ ┛ 
+   █████████   ███   █████    █████                 █████               
+  ███░░░░░███ ░░░   ░░███    ░░███                 ░░███                
+ ███     ░░░  ████  ███████   ░███████   █████ ████ ░███████            
+░███         ░░███ ░░░███░    ░███░░███ ░░███ ░███  ░███░░███           
+░███    █████ ░███   ░███     ░███ ░███  ░███ ░███  ░███ ░███           
+░░███  ░░███  ░███   ░███ ███ ░███ ░███  ░███ ░███  ░███ ░███           
+ ░░█████████  █████  ░░█████  ████ █████ ░░████████ ████████            
+  ░░░░░░░░░  ░░░░░    ░░░░░  ░░░░ ░░░░░   ░░░░░░░░ ░░░░░░░░             
+                                                                        
+                                                                        
+                                                                        
+   █████████  █████                        █████                        
+  ███░░░░░███░░███                        ░░███                         
+ ███     ░░░  ░███████    ██████   ██████  ░███ █████  ██████  ████████ 
+░███          ░███░░███  ███░░███ ███░░███ ░███░░███  ███░░███░░███░░███
+░███          ░███ ░███ ░███████ ░███ ░░░  ░██████░  ░███████  ░███ ░░░ 
+░░███     ███ ░███ ░███ ░███░░░  ░███  ███ ░███░░███ ░███░░░   ░███     
+ ░░█████████  ████ █████░░██████ ░░██████  ████ █████░░██████  █████    
+  ░░░░░░░░░  ░░░░ ░░░░░  ░░░░░░   ░░░░░░  ░░░░ ░░░░░  ░░░░░░  ░░░░░     
                                                                                                                         
 ------------------------------------------------------------------------------------------------------------------------` + Cyan + `
 GitHub Usename Checker — by ytax - https://oguser.com/clarke
@@ -240,11 +255,16 @@ func main() {
 
 	for i := progress; i < len(ids); i++ {
 		id := ids[i]
-		if !checkID(id) {
+
+		switch checkID(id) {
+		case 1:
+			fmt.Printf(Red+"Not available: %s\n"+Reset, id)
+		case 0:
 			fmt.Printf(Green+"Available: %s\n"+Reset, id)
 			file.WriteString(id + "\n")
-		} else {
-			fmt.Printf(Red+"Not available: %s\n"+Reset, id)
+		case 2:
+			time.Sleep(15 * time.Second)
+			i--
 		}
 
 		if err := updateProgress(targetsPath, i+1, ids); err != nil {
